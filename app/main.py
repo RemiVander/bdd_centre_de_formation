@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, create_engine, Session, select
 from models.teacher import Teacher
 from models.admin import Admin
+from models.room import Room
 from datetime import date
 from models.user import User
 engine = create_engine("sqlite:///test.db", echo=True)
@@ -32,6 +33,7 @@ with Session(engine) as session:
         hiring_date=date(2018, 5, 15)
     )
 
+ 
 
     session.add(teacher)
     session.add(admin)

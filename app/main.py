@@ -3,7 +3,7 @@ from models.teacher import Teacher
 from models.admin import Admin
 from datetime import date
 from models.user import User
-engine = create_engine("sqlite:///test.db", echo=True)
+engine = create_engine("sqlite:///centre_de_formation.db", echo=True)
 
 
 SQLModel.metadata.create_all(engine)

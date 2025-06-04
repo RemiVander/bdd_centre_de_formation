@@ -8,6 +8,7 @@ __pycache__/
 
 #BDD
 *.db
+*/versions
 
 # Distribution / packaging
 .Python

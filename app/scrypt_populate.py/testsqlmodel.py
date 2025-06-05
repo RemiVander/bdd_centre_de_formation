@@ -5,10 +5,11 @@ from faker import Faker
 import random
 from app.models.teacher import Teacher
 from app.models.room import Room
+from app.models.class_session import ClassSession, Status, Requirement
 from app.models.student import Student
 from app.models.admin import Admin
 from app.models.equipments import Equipments, computer_lab_equipment
-from datetime import date
+from datetime import date, timedelta
 from app.database import engine
 
 
@@ -50,6 +51,58 @@ def populate_table_room(num_room: int = 10):
                 role="user"
             )
             session.add(room)
+        session.commit()
+
+# Fonction pour générer des requirements
+def populate_table_requirements(num_requirements: int = 10):
+    with Session(engine) as session:
+        for _ in range(num_requirements):
+            requipment_entry = Requirement(
+                name = fake.unique.job()
+            )
+            session.add(requipment_entry)
+        session.commit()
+
+# Fonction pour générer les status 
+def populate_table_status():
+    with Session(engine) as session:
+        st1 = Status(type='OPEN')
+        st2 = Status(type='ARCHIVED')
+        st3 = Status(type='CLOSED')
+        session.add(st1)
+        session.add(st2)
+        session.add(st3)
+        session.commit()
+
+# Fonction pour générer des sessions fictives et les insérer dans la base de données
+def populate_table_class_session(num_class_session: int = 10):
+    with Session(engine) as session:
+        teachers = session.exec(select(Teacher)).all()
+        rooms = session.exec(select(Room)).all()
+        statuses = session.exec(select(Status)).all()
+        requirement = session.exec(select(Requirement)).all()
+
+        for _ in range(num_class_session):
+            room = random.choice(rooms)
+            teacher = random.choice(teachers)
+            status = random.choice(statuses)
+            requirements = random.choice(requirement)
+            
+            start = fake.date_time_this_year()
+            end = start + timedelta(days=random.randint(1, 5))
+
+            cs = ClassSession(
+                title=fake.catch_phrase(),
+                description=fake.sentence(),
+                start_date=start,
+                end_date=end,
+                max_capacity=random.randint(1, room.capacite),
+                statut_id=status.id,
+                room_id=room.id,
+                teacher_id=teacher.id,
+                requirement_id=requirements.id
+            )
+            session.add(cs)
         session.commit()
 
 # Fonction pour générer des étudiants fictifs et les insérer dans la base de données
@@ -104,4 +157,8 @@ populate_table_teacher(10)
 populate_table_room(6)
 populate_table_student(20)
 populate_table_admin(2)
+populate_table_requirements(10)
+populate_table_status()
+populate_table_class_session(5)
 populate_table_equipments(2)
+

@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 
 
 class User(SQLModel, table = False):
+    __tablename__ = "user"
     id : int | None = Field(default=None, primary_key=True)
     name: str
     surname : str

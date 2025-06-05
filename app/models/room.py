@@ -11,9 +11,5 @@ class Room(SQLModel, table = True):
     is_active : bool = True
     equipment_id: Optional[int] = Field(default=None, foreign_key="equipments.id")
 
-class Equipments(SQLModel, table = True):
-    __tablename__ = "equipments"
-    id : int | None = Field(default=None, primary_key=True)
-    name : str = Field(unique=True,index=True)
-    description : str
+
 

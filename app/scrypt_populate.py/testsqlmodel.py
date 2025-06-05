@@ -15,7 +15,7 @@ from app.database import engine
 SQLModel.metadata.create_all(engine)
 
 
-fake = Faker()
+fake = Faker(locale="fr_FR")
 
 
 # Fonction pour générer des données fictives teacher et les insérer dans la base de données
@@ -32,7 +32,7 @@ def populate_table_teacher(num_teacher: int = 10):
                 speciality="Data Science",
                 hiring_date=date(2021, 5, 15),
                 hours_rate=60.0,
-                bio="Experte en machine learning."
+                bio=fake.job()
             )
             session.add(teacher)
         session.commit()
@@ -54,6 +54,7 @@ def populate_table_room(num_room: int = 10):
 
 # Fonction pour générer des étudiants fictifs et les insérer dans la base de données
 def populate_table_student(num_student: int = 1):
+    diploma_list = ["Data Engineer", "Data Scientist", "Data Analyst", "DevOps"]
     with Session(engine) as session:
         for _ in range(num_student):
             student = Student(
@@ -64,7 +65,7 @@ def populate_table_student(num_student: int = 1):
                 level_degree=random.randint(1, 7),
                 telephone=random.randint(1, 100),
                 registration_date=date(2021, 5, 15),
-                diploma="Data engineer",
+                diploma=random.choice(diploma_list),
                 is_active = fake.boolean(),
                 role = "student"
             )

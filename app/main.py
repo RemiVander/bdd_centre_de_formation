@@ -9,8 +9,6 @@ engine = create_engine("sqlite:///centre_de_formation.db", echo=True)
 
 SQLModel.metadata.create_all(engine)
 
-
-
 with Session(engine) as session:
     teacher = Teacher(
         name="Alice",

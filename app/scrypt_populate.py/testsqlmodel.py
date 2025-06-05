@@ -9,7 +9,9 @@ from app.models.student import Student
 from app.models.admin import Admin
 from app.models.equipments import Equipments, computer_lab_equipment
 from datetime import date
-engine = create_engine("sqlite:///centre_de_formation.db", echo=True)
+from app.database import engine
+
+
 SQLModel.metadata.create_all(engine)
 
 

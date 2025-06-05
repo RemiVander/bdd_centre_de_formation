@@ -88,7 +88,7 @@ def populate_table_admin(num_admin: int = 1):
         session.commit()
 
 # Fonction pour générer des equipements fictifs et les insérer dans la base de données
-def populate_table_equipments(num_equipments: int = 1):
+def populate_table_equipments(num_equipment : int=1):
     with Session(engine) as session:
         for equipment in computer_lab_equipment:
             equipment_entry = Equipments(
@@ -101,7 +101,7 @@ def populate_table_equipments(num_equipments: int = 1):
 
 # Appeler la fonction pour peupler la table avec 10 héros fictifs
 populate_table_teacher(10)
+populate_table_equipments(2)
 populate_table_room(6)
 populate_table_student(20)
 populate_table_admin(2)
-populate_table_equipments(2)

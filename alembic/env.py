@@ -18,8 +18,12 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
+import app.models.teacher
+import app.models.admin
+import app.models.student
+import sqlmodel
 from sqlmodel import SQLModel
-from app import models
+
 target_metadata = SQLModel.metadata
 
 

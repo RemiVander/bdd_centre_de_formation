@@ -1,7 +1,6 @@
 from sqlmodel import SQLModel, Field
 from typing import Optional
 from sqlalchemy.dialects.postgresql import JSON
-from faker import Faker
 
 class Room(SQLModel, table = True):
     __tablename__ = "room"

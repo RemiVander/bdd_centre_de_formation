@@ -1,8 +1,8 @@
-from sqlmodel import SQLModel, Field
+from sqlmodel import Field
 from datetime import date, datetime, timezone
 from typing import Optional
 
-from models.user import User
+from app.models.user import User
 
 
 class Student(User, table=True):

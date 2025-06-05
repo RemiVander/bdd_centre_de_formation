@@ -39,22 +39,6 @@ def populate_table_teacher(num_teacher: int = 10):
     
         session.commit()
 
-#  Fonction pour générer des données fictives teacher et les insérer dans la base de données
-# def populate_table_user(num_user: int = 10):
-#     with Session(engine) as session:
-#         for _ in range(num_user):
-#             user = User(
-#                 name=fake.unique.first_name(),
-#                 surname=fake.unique.last_name(),
-#                 email=fake.email(),
-#                 creation_date= fake.date(),
-#                 is_active=True,
-#                 role="user"             
-#             )
-
-#             session.add(user)
-    
-#         session.commit()
 
 # # Fonction pour générer des salles fictives et les insérer dans la base de données
 def populate_table_room(num_room: int = 10):
@@ -79,11 +63,14 @@ def populate_table_student(num_student: int = 1):
             student = Student(
                 name=fake.unique.first_name(),
                 surname=fake.unique.last_name(),
+                email=fake.email(),
                 birth_date=fake.date_of_birth(minimum_age=16, maximum_age=30),
                 level_degree=random.randint(1, 7),
                 telephone=random.randint(1, 100),
                 registration_date=date(2021, 5, 15),
-                diploma="Data engineer"
+                diploma="Data engineer",
+                is_active = fake.boolean(),
+                role = "student"
             )
 
             session.add(student)
@@ -92,7 +79,6 @@ def populate_table_student(num_student: int = 1):
 
 # Appeler la fonction pour peupler la table avec 10 héros fictifs
 populate_table_teacher(10)
-#populate_table_user(20)
 populate_table_room(6)
 populate_table_student(2)
 

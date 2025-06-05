@@ -12,7 +12,9 @@ from datetime import date
 engine = create_engine("sqlite:///centre_de_formation.db", echo=True)
 SQLModel.metadata.create_all(engine)
 
+
 fake = Faker()
+
 
 # Fonction pour générer des données fictives teacher et les insérer dans la base de données
 def populate_table_teacher(num_teacher: int = 10):
@@ -67,7 +69,7 @@ def populate_table_student(num_student: int = 1):
             session.add(student)
         session.commit()
 
-# Fonction pour générer des étudiants fictifs et les insérer dans la base de données
+# Fonction pour générer des admins fictifs et les insérer dans la base de données
 def populate_table_admin(num_admin: int = 1):
     with Session(engine) as session:
         for _ in range(num_admin):
@@ -82,7 +84,7 @@ def populate_table_admin(num_admin: int = 1):
             session.add(admin)
         session.commit()
 
-# Fonction pour générer des étudiants fictifs et les insérer dans la base de données
+# Fonction pour générer des equipements fictifs et les insérer dans la base de données
 def populate_table_equipments(num_equipments: int = 1):
     with Session(engine) as session:
         for equipment in computer_lab_equipment:

@@ -4,7 +4,7 @@ from models.admin import Admin
 from models.room import Room
 from datetime import date
 from models.user import User
-engine = create_engine("sqlite:///centre_de_formation.db", echo=True)
+from app.database import engine
 
 
 SQLModel.metadata.create_all(engine)

@@ -21,6 +21,7 @@ if config.config_file_name is not None:
 import app.models.teacher
 import app.models.admin
 import app.models.student
+import app.models.room
 import sqlmodel
 from sqlmodel import SQLModel
 

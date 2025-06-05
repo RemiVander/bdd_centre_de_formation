@@ -2,7 +2,6 @@ from sqlmodel import SQLModel, Field
 from typing import Optional
 from sqlalchemy.dialects.postgresql import JSON
 
-
 class Room(SQLModel, table = True):
     __tablename__ = "room"
     id : int | None = Field(default=None, primary_key=True)

@@ -1,4 +1,4 @@
-from models.user import User
+from app.models.user import User
 from datetime import date
 
 class Admin(User, table=True):

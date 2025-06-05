@@ -2,7 +2,7 @@ from sqlmodel import  Field
 from datetime import date
 from typing import Optional
 
-from models.user import User
+from app.models.user import User
 
 
 class Teacher(User, table=True):

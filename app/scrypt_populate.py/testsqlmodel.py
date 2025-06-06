@@ -49,8 +49,8 @@ def populate_table_teacher(num_teacher: int = 10):
         for i in range(num_teacher):
             # Utiliser un nom unique avec un index pour éviter les doublons
             teacher = Teacher(
-                name=f"{fake.first_name()}_{i}",  # Ajout d'un index pour l'unicité
-                surname=fake.user_name() + f"_{i}",  # Ajout d'un index pour l'unicité
+                name=f"{fake.first_name()}",  # Ajout d'un index pour l'unicité
+                surname=fake.user_name(),  # Ajout d'un index pour l'unicité
                 age=fake.random_int(min=25, max=65),
                 email=f"teacher_{i}_{fake.email()}",  # Email unique
                 is_active=True,

@@ -1,6 +1,5 @@
 from sqlmodel import Field, SQLModel
 from datetime import datetime, timezone
-from sqlalchemy.sql import func
 from typing import Optional
 
 class Registration(SQLModel, table = True):

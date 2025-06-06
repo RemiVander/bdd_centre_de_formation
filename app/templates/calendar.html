@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Planning des Sessions</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/fr.min.js'></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
+    <style>
+    </style>
+</head>
+<body>
+    <div class="container" 
+         data-all-events="{{ all_events|tojson|e }}"
+         data-events-by-room="{{ events_by_room|tojson|e }}"
+         data-rooms="{{ rooms|tojson|e }}">
+        <div class="header">
+            <h1>📅 Planning des Sessions</h1>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('all')">
+                📋 Toutes les salles
+            </button>
+            {% for room in rooms %}
+            <button class="tab" onclick="showTab('room-{{ room.id }}')">
+                🏛️ {{ room.name }}
+            </button>
+            {% endfor %}
+        </div>
+        
+        <div id="tab-all" class="tab-content active">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="total-sessions">0</div>
+                    <div class="stat-label">Sessions totales</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="total-rooms">{{ rooms|length }}</div>
+                    <div class="stat-label">Salles disponibles</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="current-week-sessions">0</div>
+                    <div class="stat-label">Cette semaine</div>
+                </div>
+            </div>
+            <div id='calendar'></div>
+        </div>
+        
+        {% for room in rooms %}
+        <div id="tab-room-{{ room.id }}" class="tab-content">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="room-{{ room.id }}-sessions">0</div>
+                    <div class="stat-label">Sessions {{ room.name }}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="room-{{ room.id }}-week">0</div>
+                    <div class="stat-label">Cette semaine</div>
+                </div>
+            </div>
+            <div id='calendar-room-{{ room.id }}'></div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        // Récupération des données depuis les attributs data-*
+        const container = document.querySelector('.container');
+        const allEvents = JSON.parse(container.dataset.allEvents);
+        const eventsByRoom = JSON.parse(container.dataset.eventsByRoom);
+        const rooms = JSON.parse(container.dataset.rooms);
+        
+        // Variables globales
+        let calendars = {};
+        let tooltip = null;
+        
+        // Configuration commune pour tous les calendriers
+        const commonCalendarConfig = {
+            locale: 'fr',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            initialView: 'timeGridWeek',
+            height: 600,
+            slotMinTime: '08:00:00',
+            slotMaxTime: '18:00:00',
+            weekends: false,
+            editable: false,
+            selectable: true,
+            selectMirror: true,
+            eventDisplay: 'block',
+            eventMouseEnter: function(info) {
+                showTooltip(info);
+            },
+            eventMouseLeave: function() {
+                hideTooltip();
+            },
+            eventClick: function(info) {
+                showEventDetails(info);
+            }
+        };
+        
+        // Initialisation au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCalendars();
+            updateStats();
+        });
+        
+        function initializeCalendars() {
+            // Calendrier principal (toutes les salles)
+            const mainCalendarEl = document.getElementById('calendar');
+            calendars['all'] = new FullCalendar.Calendar(mainCalendarEl, {
+                ...commonCalendarConfig,
+                events: allEvents
+            });
+            calendars['all'].render();
+            
+            // Calendriers par salle
+            rooms.forEach(room => {
+                const calendarEl = document.getElementById(`calendar-room-${room.id}`);
+                const roomEvents = eventsByRoom[room.name] || [];
+                
+                calendars[`room-${room.id}`] = new FullCalendar.Calendar(calendarEl, {
+                    ...commonCalendarConfig,
+                    events: roomEvents
+                });
+            });
+        }
+        
+        function showTab(tabId) {
+            // Masquer tous les onglets
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Afficher l'onglet sélectionné
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Rendre le calendrier correspondant
+            if (calendars[tabId] && !calendars[tabId].isRendered) {
+                calendars[tabId].render();
+            }
+            
+            hideTooltip();
+        }
+        
+        function showTooltip(info) {
+            hideTooltip();
+            
+            const props = info.event.extendedProps;
+            const tooltipContent = `
+                <strong>${info.event.title}</strong><br>
+                📅 ${formatDate(info.event.start)} - ${formatDate(info.event.end)}<br>
+                👨‍🏫 Enseignant: ${props.teacher}<br>
+                🏛️ Salle: ${props.room}<br>
+                👥 Capacité max: ${props.max_capacity}<br>
+                📝 ${props.description || 'Pas de description'}
+            `;
+            
+            tooltip = document.createElement('div');
+            tooltip.className = 'event-tooltip';
+            tooltip.innerHTML = tooltipContent;
+            tooltip.style.left = info.jsEvent.pageX + 10 + 'px';
+            tooltip.style.top = info.jsEvent.pageY + 10 + 'px';
+            
+            document.body.appendChild(tooltip);
+        }
+        
+        function hideTooltip() {
+            if (tooltip) {
+                tooltip.remove();
+                tooltip = null;
+            }
+        }
+        
+        function showEventDetails(info) {
+            const props = info.event.extendedProps;
+            alert(`Détails de la session:
+            
+Titre: ${info.event.title}
+Dates: ${formatDate(info.event.start)} - ${formatDate(info.event.end)}
+Enseignant: ${props.teacher}
+Salle: ${props.room}
+Capacité maximale: ${props.max_capacity}
+Description: ${props.description || 'Aucune description'}
+            `);
+        }
+        
+        function formatDate(date) {
+            return new Date(date).toLocaleString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function updateStats() {
+            // Stats générales
+            document.getElementById('total-sessions').textContent = allEvents.length;
+            
+            // Sessions de la semaine courante
+            const now = new Date();
+            const weekStart = new Date(now.setDate(now.getDate() - now.getDay() + 1));
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            
+            const thisWeekEvents = allEvents.filter(event => {
+                const eventDate = new Date(event.start);
+                return eventDate >= weekStart && eventDate <= weekEnd;
+            });
+            
+            document.getElementById('current-week-sessions').textContent = thisWeekEvents.length;
+            
+            // Stats par salle
+            rooms.forEach(room => {
+                const roomEvents = eventsByRoom[room.name] || [];
+                const roomWeekEvents = roomEvents.filter(event => {
+                    const eventDate = new Date(event.start);
+                    return eventDate >= weekStart && eventDate <= weekEnd;
+                });
+                
+                const sessionsEl = document.getElementById(`room-${room.id}-sessions`);
+                const weekEl = document.getElementById(`room-${room.id}-week`);
+                
+                if (sessionsEl) sessionsEl.textContent = roomEvents.length;
+                if (weekEl) weekEl.textContent = roomWeekEvents.length;
+            });
+        }
+    </script>
+</body>
+</html>

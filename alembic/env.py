@@ -23,6 +23,7 @@ import app.models.admin
 import app.models.student
 import app.models.equipments
 import app.models.room
+import app.models.class_session
 import sqlmodel
 from sqlmodel import SQLModel
 

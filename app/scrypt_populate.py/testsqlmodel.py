@@ -256,6 +256,7 @@ def populate_table_admin(num_admin: int = 2):
                 is_active=fake.boolean(),
                 role="admin"
             )
+            admin = Admin.model_validate(admin)
             session.add(admin)
         session.commit()
         print(f"{num_admin} admins créés avec succès.")

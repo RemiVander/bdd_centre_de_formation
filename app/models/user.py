@@ -9,6 +9,10 @@ class User(SQLModel, table = False):
     name: str = Field(max_length=50)
     surname : str = Field(max_length=50)
     email: EmailStr
-    creation_date : datetime = Field(default_factory=datetime.utcnow)
-    is_active : bool
+    creation_date : datetime | None = Field(
+        default=None,
+        sa_column_kwargs={"server_default": func.now()}
+    )
+    is_active : bool  = Field(default=True)
+    #change role to ENUM ?
     role : str

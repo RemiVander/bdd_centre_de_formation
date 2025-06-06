@@ -8,6 +8,6 @@ class User(SQLModel, table = False):
     name: str
     surname : str
     email: str
-    creation_date : datetime = Field(sa_column_kwargs={"server_default": func.now()})
+    creation_date : datetime = Field(default_factory=datetime.utcnow)
     is_active : bool
     role : str

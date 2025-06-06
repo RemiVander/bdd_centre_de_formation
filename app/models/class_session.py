@@ -15,9 +15,9 @@ class ClassSession(SQLModel, table = True):
     end_date : datetime
     #TO DO :max_capacity < room.capacity
     max_capacity : int
-    statut_id : str = Field(default='OPEN', foreign_key='status.id')
+    statut_id : int = Field(default='OPEN', foreign_key='status.id')
     #TO DO :requirement is a list
-    requirement_id : str | None = Field(default=None, foreign_key='requirement.id')
+    requirement_id : int | None = Field(default=None, foreign_key='requirement.id')
     room_id : int = Field(foreign_key='room.id') 
     teacher_id : int = Field(foreign_key='teacher.id') 
 

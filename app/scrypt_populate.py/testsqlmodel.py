@@ -60,6 +60,7 @@ def populate_table_teacher(num_teacher: int = 10):
                 hours_rate=random.choice([45.0, 50.0, 55.0, 60.0, 65.0, 70.0]),
                 bio=fake.job()
             )
+            teacher = Teacher.model_validate(teacher)
             session.add(teacher)
         session.commit()
         print(f"{num_teacher} enseignants créés avec succès.")
@@ -87,6 +88,7 @@ def populate_table_room(num_room: int = 10):
                 role="user"  # Si ce champ existe dans votre modèle
             )
             session.add(room)
+            room = Room.model_validate(room)
         session.commit()
         print(f"{min(num_room, len(room_names))} salles créées avec succès.")
 
@@ -203,7 +205,7 @@ def populate_realistic_class_sessions(num_weeks: int = 4):
                         teacher_id=teacher.id,
                         requirement_id=requirement.id
                     )
-                    
+                    cs = ClassSession.model_validate(cs)
                     session.add(cs)
                     used_time_slots.append(time_slot)
                     used_rooms.append(room)
@@ -233,6 +235,7 @@ def populate_table_student(num_student: int = 20):
                 is_active=fake.boolean(),
                 role="student"
             )
+            student = Student.model_validate(student)
             session.add(student)
         session.commit()
         print(f"{num_student} étudiants créés avec succès.")
@@ -253,6 +256,7 @@ def populate_table_admin(num_admin: int = 2):
                 is_active=fake.boolean(),
                 role="admin"
             )
+            admin = Admin.model_validate(admin)
             session.add(admin)
         session.commit()
         print(f"{num_admin} admins créés avec succès.")

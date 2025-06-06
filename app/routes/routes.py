@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, flash
 from sqlmodel import Session, select
 from app.database import engine
 from app.models.teacher import Teacher
 from app.models.room import Room
 from app.models.class_session import ClassSession
+from app.models.user import User
 from sqlalchemy.orm import selectinload
 import json
 
@@ -64,3 +65,39 @@ def calendar_view():
         rooms=[{"id": r.id, "name": r.name} for r in rooms]
 
     )
+
+@main_routes.route("/register", methods=["GET"])
+def show_register_form():
+    return render_template("register_user.html")
+
+@main_routes.route("/register_user", methods=["POST"])
+def register_user():
+    name = request.form.get("first name")
+    surname = request.form.get("surname")
+    age = request.form.get("age")
+    email = request.form.get("Enter your Email adress")
+    telephone = request.form.get("Enter your phonenumber")
+
+    with Session(engine) as session:
+        existing_user = session.exec(select(Teacher).where(Teacher.email == email)).first()
+        if existing_user:
+            flash("A user with this email already exists!")
+            return redirect("/error_user_exist")
+
+        new_teacher = Teacher(
+            name=name,
+            surname=surname,
+            age=age,
+            email=email,
+            is_active=True,
+            role="teacher",
+            speciality="",
+            hiring_date=None,
+            hours_rate=0.0,
+            bio=None
+        )
+
+        session.add(new_teacher)
+        session.commit()
+        flash("Teacher successfully registered!")
+        return redirect("/success")

@@ -4,11 +4,11 @@ from app.database import engine
 from app.models.teacher import Teacher
 from app.models.student import Student
 from app.models.room import Room
-from app.models.class_session import ClassSession
+from app.models.class_session import ClassSession, Requirement
 from app.models.user import User
 from sqlalchemy.orm import selectinload
 import json
-from datetime import date
+from datetime import date, datetime, timedelta
 
 main_routes = Blueprint("main", __name__)
 role_id = []
@@ -193,11 +193,56 @@ def login():
 def logout():
     return render_template('logout.html')
 
-@main_routes.route('/create_event')
-def create_event():
-    # Vérifiez si l'utilisateur est un enseignant
-    if 'user' not in session or session['user']['role'] != 'teacher':
-        flash('You are not authorized to create an event.')
-        return redirect(url_for('main.calendar'))
 
-    return render_template('create_event.html')
+@main_routes.route("/success_session")
+def succes_session():
+    return render_template("success_session.html")
+
+
+@main_routes.route("/create_session", methods=["GET", "POST"])
+def create_session():
+    if request.method == "POST":
+        title = request.form["title"]
+        description = request.form["description"]
+        session_date = request.form["session_date"]
+        time_slot = request.form["time_slot"]
+        max_capacity = int(request.form["max_capacity"])
+        requirement_id = request.form.get("requirement_id") or None
+        room_id = int(request.form["room_id"])
+        teacher_id = int(request.form["teacher_id"])
+
+        # Parse date
+        date_obj = datetime.strptime(session_date, "%Y-%m-%d")
+
+        # Parse time slot to start and end times
+        start_str, end_str = time_slot.split('-')  # e.g. '8:00', '10:00'
+        start_hour, start_minute = map(int, start_str.split(':'))
+        end_hour, end_minute = map(int, end_str.split(':'))
+
+        start_datetime = date_obj.replace(hour=start_hour, minute=start_minute)
+        end_datetime = date_obj.replace(hour=end_hour, minute=end_minute)
+
+        new_session = ClassSession(
+            title=title,
+            description=description,
+            start_date= start_datetime,
+            end_date= end_datetime,
+            max_capacity= max_capacity,
+            requirement_id=int(requirement_id) if requirement_id else None,
+            room_id=room_id,
+            teacher_id=teacher_id
+        )
+
+        with Session(engine) as session:
+            new_session= ClassSession.model_validate(new_session)
+            session.add(new_session)
+            session.commit()
+        return redirect("/success_session")
+    
+    with Session(engine) as session:
+        titles = list(set(s.title for s in session.exec(select(ClassSession)).all()))
+        teachers = session.exec(select(Teacher)).all()
+        rooms = session.exec(select(Room)).all()
+        requirements = session.exec(select(Requirement)).all()
+    
+    return render_template("create_session.html",titles=titles,teachers=teachers,rooms=rooms,requirements=requirements)

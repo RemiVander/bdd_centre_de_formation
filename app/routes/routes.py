@@ -246,3 +246,43 @@ def create_session():
         requirements = session.exec(select(Requirement)).all()
     
     return render_template("create_session.html",titles=titles,teachers=teachers,rooms=rooms,requirements=requirements)
+
+
+@main_routes.route("/available_courses")
+def available_courses():
+    with Session(engine) as session:
+        # Récupérez toutes les sessions et les salles
+        sessions = session.exec(select(ClassSession)).all()
+        rooms = session.exec(select(Room)).all()
+
+        # Créez un dictionnaire pour les salles
+        rooms_dict = {room.id: room for room in rooms}
+
+        # Filtrez les sessions en fonction de la capacité disponible
+        available_sessions = []
+        for s in sessions:
+            room = rooms_dict.get(s.room_id)
+            if room and s.current_enrollment < s.max_capacity:  # Assurez-vous que current_enrollment est un champ de votre modèle ClassSession
+                available_sessions.append(s)
+
+        # Préparez les événements pour le calendrier
+        all_events = []
+        for s in available_sessions:
+            room = rooms_dict.get(s.room_id)
+            event = {
+                "id": s.id,
+                "title": s.title,
+                "start": s.start_date.isoformat(),
+                "end": s.end_date.isoformat(),
+                "description": s.description,
+                "extendedProps": {
+                    "room": room.name if room else "Non assignée",
+                    "max_capacity": s.max_capacity,
+                    "current_enrollment": s.current_enrollment
+                },
+                "backgroundColor": f"hsl({hash(str(s.room_id)) % 360}, 70%, 60%)",
+                "borderColor": f"hsl({hash(str(s.room_id)) % 360}, 70%, 50%)"
+            }
+            all_events.append(event)
+
+    return render_template("available_courses.html", all_events=all_events)

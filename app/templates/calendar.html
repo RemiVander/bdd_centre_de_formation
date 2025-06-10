@@ -24,8 +24,13 @@
       <h1>📅 Planning des Sessions</h1>
     </div>
     <div>
-          {% if session.get('user') and session['user']['role'] == 'teacher' %}
+      {% if session.get('user') and session['user']['role'] == 'teacher' %}
         <button id="createEventButton" class="button is-info">Créer un événement</button>
+      {% endif %}
+
+      {% if session.get('user') and session['user']['role'] == 'student' %}
+      <button id="enrollCourseButton" class="button" onclick="window.location.href='/available_courses'">Choisir un cours</button>
+
       {% endif %}
     </div>
     <div class="tabs">

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Cours Disponibles</title>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Cours Disponibles</h1>
+    </div>
+    <div id="calendar"></div>
+  </div>
+
+  <!-- Charger les scripts à la fin du body pour s'assurer que le DOM est chargé -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const calendarEl = document.getElementById('calendar');
+      // Utilisez la syntaxe correcte pour intégrer la variable Jinja2 dans JavaScript
+      const allEvents = { all_events , tojson , safe }
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'fr',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        initialView: 'timeGridWeek',
+        height: 600,
+        slotMinTime: '08:00:00',
+        slotMaxTime: '18:00:00',
+        weekends: false,
+        editable: false,
+        selectable: true,
+        events: allEvents
+      });
+
+      calendar.render() ;})
+                        
+  </script>
+</body>
+</html>

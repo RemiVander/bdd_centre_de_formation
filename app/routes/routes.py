@@ -76,7 +76,7 @@ def register_user():
     surname = request.form.get("surname")
     age = request.form.get("age")
     email = request.form.get("Enter your Email adress")
-    telephone = request.form.get("Enter your phonenumber")
+    speciality = request.form.get("Enter your speciality")
 
     with Session(engine) as session:
         existing_user = session.exec(select(Teacher).where(Teacher.email == email)).first()
@@ -91,7 +91,7 @@ def register_user():
             email=email,
             is_active=True,
             role="teacher",
-            speciality="",
+            speciality=speciality,
             hiring_date=None,
             hours_rate=0.0,
             bio=None

@@ -200,8 +200,9 @@ def create_session():
         return redirect("/success_session")
     
     with Session(engine) as session:
+        title = list(set(s.title for s in session.exec(select(ClassSession)).all()))
         teachers = session.exec(select(Teacher)).all()
         rooms = session.exec(select(Room)).all()
         requirements = session.exec(select(Requirement)).all()
     
-    return render_template("create_session.html",teachers=teachers,rooms=rooms,requirements=requirements)
+    return render_template("create_session.html",title=title,teachers=teachers,rooms=rooms,requirements=requirements)

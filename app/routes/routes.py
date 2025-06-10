@@ -154,6 +154,10 @@ from flask import render_template
 def succes():
     return render_template("success.html")
 
+@main_routes.route("/success_session")
+def succes_session():
+    return render_template("success_session.html")
+
 
 @main_routes.route("/create_session", methods=["GET", "POST"])
 def create_session():

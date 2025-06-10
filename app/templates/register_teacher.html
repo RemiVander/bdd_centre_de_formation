@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Teacher</title>
+</head>
+<body>
+    <h1>Register New Teacher</h1>
+    <form action="/register_user" method="POST">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="first_name" name="name" required>
+        </div>
+        <div>
+            <label for="surname">Surname:</label>
+            <input type="text" id="surname" name="surname" required>
+        </div>
+        <div>
+            <label for="age">Age:</label>
+            <input type="text" id="age" name="age" required>
+        </div>
+        <div>
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="speciality">speciality:</label>
+            <input type="text" id="email" name="speciality" required>
+        </div>
+        <div>
+            <label for="telephone">Phone Number:</label>
+            <input type="tel" id="telephone" name="telephone">
+        </div>
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>

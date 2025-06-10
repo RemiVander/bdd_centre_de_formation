@@ -11,6 +11,7 @@ import json
 from datetime import date
 
 main_routes = Blueprint("main", __name__)
+role_id = []
 
 @main_routes.route("/")
 def home():
@@ -192,4 +193,11 @@ def login():
 def logout():
     return render_template('logout.html')
 
+@main_routes.route('/create_event')
+def create_event():
+    # Vérifiez si l'utilisateur est un enseignant
+    if 'user' not in session or session['user']['role'] != 'teacher':
+        flash('You are not authorized to create an event.')
+        return redirect(url_for('main.calendar'))
 
+    return render_template('create_event.html')

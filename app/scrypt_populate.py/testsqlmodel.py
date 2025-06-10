@@ -224,8 +224,8 @@ def populate_table_student(num_student: int = 20):
         
         for i in range(num_student):
             student = Student(
-                name=f"{fake.first_name()}_{i}",
-                surname=f"{fake.last_name()}_{i}",
+                name=f"{fake.first_name()}",
+                surname=f"{fake.last_name()}",
                 email=f"student_{i}_{fake.email()}",
                 birth_date=fake.date_of_birth(minimum_age=16, maximum_age=30),
                 level_degree=random.randint(1, 7),

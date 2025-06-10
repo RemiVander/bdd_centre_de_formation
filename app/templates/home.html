@@ -1,14 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
+    <meta charset="UTF-8">
     <title>Accueil</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 100px;
+        }
+        h1 {
+            margin-bottom: 40px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .button-container form {
+            display: inline;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>Liste des enseignants</h1>
-    <ul>
-        {% for teacher in teachers %}
-            <li>{{ teacher.name }} {{ teacher.surname }}</li>
-        {% endfor %}
-    </ul>
+    <h1>Bienvenue sur le portail du centre de formation</h1>
+
+    <div class="button-container">
+        <form action="/login" method="get">
+            <button type="submit">Se connecter</button>
+        </form>
+
+        <form action="/register_teacher" method="get">
+            <button type="submit">Créer un enseignant</button>
+        </form>
+
+        <form action="/register_student" method="get">
+            <button type="submit">Créer un étudiant</button>
+        </form>
+    </div>
 </body>
 </html>

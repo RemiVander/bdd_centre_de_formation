@@ -8,7 +8,7 @@ from app.models.class_session import ClassSession, Requirement
 from app.models.user import User
 from sqlalchemy.orm import selectinload
 import json
-from datetime import date
+from datetime import date, datetime, timedelta
 
 main_routes = Blueprint("main", __name__)
 
@@ -159,19 +159,30 @@ def succes():
 def create_session():
     if request.method == "POST":
         title = request.form["title"]
-        description = request.form.get("description")
-        start_date= request.form["start_date"]
-        end_date= request.form["end_date"]
+        description = request.form["description"]
+        session_date = request.form["session_date"]
+        time_slot = request.form["time_slot"]
         max_capacity = int(request.form["max_capacity"])
         requirement_id = request.form.get("requirement_id") or None
         room_id = int(request.form["room_id"])
         teacher_id = int(request.form["teacher_id"])
 
+        # Parse date
+        date_obj = datetime.strptime(session_date, "%Y-%m-%d")
+
+        # Parse time slot to start and end times
+        start_str, end_str = time_slot.split('-')  # e.g. '8:00', '10:00'
+        start_hour, start_minute = map(int, start_str.split(':'))
+        end_hour, end_minute = map(int, end_str.split(':'))
+
+        start_datetime = date_obj.replace(hour=start_hour, minute=start_minute)
+        end_datetime = date_obj.replace(hour=end_hour, minute=end_minute)
+
         new_session = ClassSession(
             title=title,
             description=description,
-            start_date= date.fromisoformat(start_date),
-            end_date= date.fromisoformat(end_date),
+            start_date= start_datetime,
+            end_date= end_datetime,
             max_capacity= max_capacity,
             requirement_id=int(requirement_id) if requirement_id else None,
             room_id=room_id,

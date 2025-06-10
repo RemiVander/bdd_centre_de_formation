@@ -193,7 +193,7 @@ def create_session():
             new_session= ClassSession.model_validate(new_session)
             session.add(new_session)
             session.commit()
-        return redirect("/success")
+        return redirect("/success_session")
     
     with Session(engine) as session:
         teachers = session.exec(select(Teacher)).all()

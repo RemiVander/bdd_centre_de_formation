@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+
+<body>
+    <div class="container">
+        <h1>Login</h1>
+        <div class="box">
+            <form method="POST" action="{{ url_for('main.login') }}">
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-large" type="email" name="email" placeholder="Your Email" autofocus>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-large" type="text" name="surname" placeholder="Your Surname">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="checkbox">
+                        <input type="checkbox" name="remember"> Remember me
+                    </label>
+                </div>
+                <button class="button is-block is-info is-large is-fullwidth">Login</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

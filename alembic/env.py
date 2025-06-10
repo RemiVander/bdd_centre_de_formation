@@ -24,6 +24,7 @@ import app.models.student
 import app.models.equipments
 import app.models.room
 import app.models.class_session
+import app.models.registration
 import sqlmodel
 from sqlmodel import SQLModel
 

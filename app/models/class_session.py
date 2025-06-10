@@ -4,28 +4,26 @@ from sqlalchemy.sql import func
 from typing import Optional
 from pydantic import model_validator
 
-class ClassSession(SQLModel, table = True):
+class ClassSession(SQLModel, table=True):
     __tablename__ = "class_session"
 
-
-    id : int | None = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     title: str = Field(max_length=100)
-    description : Optional[str] = None
+    description: Optional[str] = None
     start_date: datetime
-    end_date : datetime
-    #TO DO :max_capacity < room.capacity
-    max_capacity : int
-    statut_id : int = Field(default='OPEN', foreign_key='status.id')
-    #TO DO :requirement is a list
-    requirement_id : int | None = Field(default=None, foreign_key='requirement.id')
-    room_id : int = Field(foreign_key='room.id') 
-    teacher_id : int = Field(foreign_key='teacher.id') 
+    end_date: datetime
+    max_capacity: int
+    statut_id: int = Field(default=1, foreign_key="status.id")  # Supposons que 'OPEN' = id 1 dans status
+    requirement_id: Optional[int] = Field(default=None, foreign_key="requirement.id")
+    room_id: int = Field(foreign_key="room.id")
+    teacher_id: int = Field(foreign_key="teacher.id")
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def check_dates(self):
         if self.start_date >= self.end_date:
             raise ValueError("start must be before end date")
         return self
+
     
 class Requirement(SQLModel, table = True):
     __tablename__ = "requirement"

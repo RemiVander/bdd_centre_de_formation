@@ -67,44 +67,51 @@ def calendar_view():
 
     )
 
-@main_routes.route("/register", methods=["GET"])
+@main_routes.route("/register",methods=["GET", "POST"])
 def show_register_form():
     return render_template("register_user.html")
 
-@main_routes.route("/register_teacher", methods=["POST"])
-def register_user():
-    name = request.form.get("name")
-    surname = request.form.get("surname")
-    age = request.form.get("age")
-    email = request.form.get("email")
-    speciality = request.form.get("speciality")
-
-    with Session(engine) as session:
-        existing_user = session.exec(select(Teacher).where(Teacher.email == email)).first()
-        if existing_user:
-            flash("A user with this email already exists!")
-            return redirect("/error_user_exist")
-
-        new_teacher = Teacher(
-            name=name,
-            surname=surname,
-            age=age,
-            email=email,
-            is_active=True,
-            role="teacher",
-            speciality=speciality,
-            hiring_date=date.today(),
-            hours_rate=0.0,
-            bio=None
-        )
-
-        session.add(new_teacher)
-        session.commit()
-        flash("Teacher successfully registered!")
-        return redirect("/success")
+@main_routes.route("/register_teacher", methods=["GET", "POST"])
+def register_teacher():
+    if request.method == "GET":
+        return render_template("register_teacher.html") 
+    
+    if request.method == "POST":
+        name = request.form.get("name")
+        surname = request.form.get("surname")
+        age = request.form.get("age")
+        email = request.form.get("email")
+        speciality = request.form.get("speciality")
+        
+        with Session(engine) as session:
+            existing_user = session.exec(select(Teacher).where(Teacher.email == email)).first()
+            if existing_user:
+                flash("A user with this email already exists!")
+                return redirect("/error_user_exist")
+            
+            new_teacher = Teacher(
+                name=name,
+                surname=surname,
+                age=age,
+                email=email,
+                is_active=True,
+                role="teacher",
+                speciality=speciality,
+                hiring_date=date.today(),
+                hours_rate=0.0,
+                bio=None
+            )
+            session.add(new_teacher)
+            session.commit()
+            flash("Teacher successfully registered!")
+            return redirect("/success")
+        
 
 @main_routes.route("/register_student", methods=["GET", "POST"])
 def register_student():
+    if request.method == "GET":
+        return render_template("register_student.html")
+    
     if request.method == "POST":
         name = request.form["name"]
         surname = request.form["surname"]
@@ -113,25 +120,28 @@ def register_student():
         telephone = request.form.get("telephone")
         level_degree = request.form.get("level_degree")
         diploma = request.form.get("diploma")
-
-        new_student = Student(
-            name=name,
-            surname=surname,
-            email=email,
-            is_active=True,
-            role="student",
-            birth_date=date.fromisoformat(birth_date),
-            telephone=telephone,
-            level_degree=level_degree,
-            diploma=diploma
-        )
-
+        
         with Session(engine) as session:
+            existing_user = session.exec(select(Student).where(Student.email == email)).first()
+            if existing_user:
+                flash("A user with this email already exists!")
+                return redirect("/error_user_exist")
+                
+            new_student = Student(
+                name=name,
+                surname=surname,
+                email=email,
+                is_active=True,
+                role="student",
+                birth_date=date.fromisoformat(birth_date),
+                telephone=telephone,
+                level_degree=level_degree,
+                diploma=diploma
+            )
             session.add(new_student)
             session.commit()
-        return redirect("/success")
-    
-    return render_template("register_student.html")
+            flash("Student successfully registered!")
+            return redirect("/success")
 
 
 @main_routes.route("/error_user_exist")

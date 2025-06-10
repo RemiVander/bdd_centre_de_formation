@@ -159,13 +159,13 @@ def login():
     if request.method == "POST":
         email = request.form.get('email')
         surname = request.form.get('surname')
-        remember = True if request.form.get('remember') else False
-
+        role = request.form.get('role')
+        
         with Session(engine) as db_session:
             student = db_session.exec(select(Student).where(Student.email == email)).first()
             teacher = db_session.exec(select(Teacher).where(Teacher.email == email)).first()
 
-            if student and student.surname == surname:
+            if student and student.surname == surname and role == "student":
                 session['user'] = {
                     'email': email,
                     'surname': surname,
@@ -174,7 +174,7 @@ def login():
                 }
                 return redirect('/calendar')
 
-            elif teacher and teacher.surname == surname:
+            elif teacher and teacher.surname == surname and role == "teacher":
                 session['user'] = {
                     'email': email,
                     'surname': surname,

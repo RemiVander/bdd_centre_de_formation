@@ -5,7 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
-
+    <style>
+        .select.is-large select {
+            font-size: 1.25rem;
+            height: 3em;
+            padding: 0.5em;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            width: 100%;
+        }
+    </style>
+</head>
 <body>
     <div class="container">
         <h1>Login</h1>
@@ -22,9 +32,15 @@
                     </div>
                 </div>
                 <div class="field">
-                    <label class="checkbox">
-                        <input type="checkbox" name="remember"> Remember me
-                    </label>
+                    <div class="control">
+                        <div class="select is-large">
+                            <select name="role">
+                                <option value="" disabled selected>Your Position</option>
+                                <option value="student">Student</option>
+                                <option value="teacher">Teacher</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <button class="button is-block is-info is-large is-fullwidth">Login</button>
             </form>
@@ -32,4 +48,3 @@
     </div>
 </body>
 </html>
-

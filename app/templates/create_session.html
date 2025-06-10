@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Créer une session</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>Créer une session</h1>
+    <form action="/create_session" method="POST">
+      
+      <div class="form-group">
+        <label for="title">Titre session :</label>
+        <input type="text" id="title" name="title" required>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description :</label>
+        <input type="text" id="description" name="description">
+      </div>
+
+      <div class="form-group">
+        <label for="start_date">Date et heure de début :</label>
+        <input type="datetime-local" id="start_date" name="start_date" required>
+      </div>
+
+      <div class="form-group">
+        <label for="end_date">Date et heure de fin :</label>
+        <input type="datetime-local" id="end_date" name="end_date" required>
+      </div>
+
+      <div class="form-group">
+        <label for="max_capacity">Capacité maximale :</label>
+        <input type="number" id="max_capacity" name="max_capacity" min="1" required>
+      </div>
+
+      <div class="form-group">
+        <label for="requirement_id">Prérequis (facultatif) :</label>
+        <select id="requirement_id" name="requirement_id">
+          <option value="">Aucun</option>
+          {% for req in requirements %}
+            <option value="{{ req.id }}">{{ req.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="room_id">Salle :</label>
+        <select id="room_id" name="room_id" required>
+          {% for room in rooms %}
+            <option value="{{ room.id }}">{{ room.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="teacher_id">Enseignant :</label>
+        <select id="teacher_id" name="teacher_id" required>
+          {% for teacher in teachers %}
+            <option value="{{ teacher.id }}">{{ teacher.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit">Enregistrer</button>
+    </form>
+  </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, flash
+from flask import Blueprint, render_template, request, redirect, flash, url_for, session
 from sqlmodel import Session, select
 from app.database import engine
 from app.models.teacher import Teacher
@@ -153,6 +153,45 @@ from flask import render_template
 @main_routes.route("/success")
 def succes():
     return render_template("success.html")
+
+@main_routes.route('/login', methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form.get('email')
+        surname = request.form.get('surname')
+        role = request.form.get('role')
+        
+        with Session(engine) as db_session:
+            student = db_session.exec(select(Student).where(Student.email == email)).first()
+            teacher = db_session.exec(select(Teacher).where(Teacher.email == email)).first()
+
+            if student and student.surname == surname and role == "student":
+                session['user'] = {
+                    'email': email,
+                    'surname': surname,
+                    'role': 'student',
+                    'id': student.id
+                }
+                return redirect('/calendar')
+
+            elif teacher and teacher.surname == surname and role == "teacher":
+                session['user'] = {
+                    'email': email,
+                    'surname': surname,
+                    'role': 'teacher',
+                    'id': teacher.id
+                }
+                return redirect('/calendar')
+
+            else:
+                flash('Please check your login details and try again.')
+
+    return render_template('login.html')
+
+@main_routes.route('/logout')
+def logout():
+    return render_template('logout.html')
+
 
 @main_routes.route("/success_session")
 def succes_session():

@@ -144,3 +144,34 @@ from flask import render_template
 def succes():
     return render_template("success.html")
 
+
+@main_routes.route("/create_session", methods=["GET", "POST"])
+def create_session():
+    if request.method == "POST":
+        title = request.form["title"]
+        description = request.form["description"]
+        start_date= request.form["start_date"]
+        end_date= request.form["end_date"]
+        max_capacity = request.form["max_capacity"]
+
+        new_session = ClassSession(
+            title=title,
+            description=description,
+            start_date= date.fromisoformat(start_date),
+            end_date= date.fromisoformat(end_date),
+            max_capacity= max_capacity,
+            requirement_id=
+            room_id=
+            teacher_id=
+        )
+
+        requirement_id: Optional[int] = Field(default=None, foreign_key="requirement.id")
+        room_id: int = Field(foreign_key="room.id")
+        teacher_id: int = Field(foreign_key="teacher.id")
+        with Session(engine) as session:
+            new_session= ClassSession.model_validate(new_session)
+            session.add(new_session)
+            session.commit()
+        return redirect("/success")
+    
+    return render_template("register_student.html")

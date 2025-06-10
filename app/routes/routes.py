@@ -144,3 +144,16 @@ from flask import render_template
 def succes():
     return render_template("success.html")
 
+@main_routes.route("/profile")
+def profile():
+    return render_template("profile.html")
+
+@main_routes.route('/login')
+def login():
+    return render_template('login.html')
+
+@main_routes.route('/logout')
+def logout():
+    return render_template('logout.html')
+
+

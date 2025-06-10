@@ -4,7 +4,7 @@ from app.database import engine
 from app.models.teacher import Teacher
 from app.models.student import Student
 from app.models.room import Room
-from app.models.class_session import ClassSession
+from app.models.class_session import ClassSession, Requirement
 from app.models.user import User
 from sqlalchemy.orm import selectinload
 import json
@@ -159,10 +159,13 @@ def succes():
 def create_session():
     if request.method == "POST":
         title = request.form["title"]
-        description = request.form["description"]
+        description = request.form.get("description")
         start_date= request.form["start_date"]
         end_date= request.form["end_date"]
-        max_capacity = request.form["max_capacity"]
+        max_capacity = int(request.form["max_capacity"])
+        requirement_id = request.form.get("requirement_id") or None
+        room_id = int(request.form["room_id"])
+        teacher_id = int(request.form["teacher_id"])
 
         new_session = ClassSession(
             title=title,
@@ -170,18 +173,20 @@ def create_session():
             start_date= date.fromisoformat(start_date),
             end_date= date.fromisoformat(end_date),
             max_capacity= max_capacity,
-            requirement_id=
-            room_id=
-            teacher_id=
+            requirement_id=int(requirement_id) if requirement_id else None,
+            room_id=room_id,
+            teacher_id=teacher_id
         )
 
-        requirement_id: Optional[int] = Field(default=None, foreign_key="requirement.id")
-        room_id: int = Field(foreign_key="room.id")
-        teacher_id: int = Field(foreign_key="teacher.id")
         with Session(engine) as session:
             new_session= ClassSession.model_validate(new_session)
             session.add(new_session)
             session.commit()
         return redirect("/success")
     
-    return render_template("register_student.html")
+    with Session(engine) as session:
+        teachers = session.exec(select(Teacher)).all()
+        rooms = session.exec(select(Room)).all()
+        requirements = session.exec(select(Requirement)).all()
+    
+    return render_template("create_session.html",teachers=teachers,rooms=rooms,requirements=requirements)

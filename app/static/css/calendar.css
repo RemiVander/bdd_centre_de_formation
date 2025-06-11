@@ -138,3 +138,24 @@ body {
     color: #6c757d;
     margin-top: 5px;
 }
+
+.create-session-btn {
+    text-align: left;
+    margin-top: 10px;
+  }
+  
+  .btn-create {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-create:hover {
+    background-color: #45a049;
+  }
+  

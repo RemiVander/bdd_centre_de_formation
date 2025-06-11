@@ -22,7 +22,7 @@ Ce projet est une application web développée avec Flask et SQLModel pour gére
 - Visualisation des salles et des capacités
 
 ## Structure du Projet
-
+```
 bdd_centre_de_formatop,/
 ├── alembic/                # Contient les fichiers de configuration et les scripts de migration pour la base de données.
 │   ├── versions/               # Contient les fichiers de migration de la base de données.

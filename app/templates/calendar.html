@@ -21,6 +21,14 @@
 
     <div class="header">
       <h1>📅 Planning des Sessions</h1>
+
+      {% if role == 'teacher' %}
+        <div class="create-session-btn">
+          <a href="/create_session">
+            <button class="btn-create">➕ Créer une session</button>
+          </a>
+        </div>
+      {% endif %}
     </div>
 
     <div class="tabs">

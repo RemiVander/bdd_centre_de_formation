@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Session créée</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/success_session.css') }}">
 </head>
 <body>
-    <h1>Session créée avec succès !</h1>
-    <p>La session a bien été enregistrée dans le système.</p>
-    <a href="/create_session">Créer une autre session</a><br>
-    <a href="/calendar">Voir le calendrier des sessions</a>
+    <div class="card">
+        <h1>✅ Session créée avec succès !</h1>
+        <p>La session a bien été enregistrée dans le système.</p>
+        <a class="button" href="{{ url_for('session.create_session') }}">➕ Créer une autre session</a><br>
+        <a class="button" href="{{ url_for('calendar.calendar_view') }}">📅 Voir le calendrier</a>
+    </div>
 </body>
 </html>

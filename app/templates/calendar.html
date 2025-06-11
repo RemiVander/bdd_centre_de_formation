@@ -3,103 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <title>Planning des Sessions</title>
-  
-  <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
-
-  <!-- FullCalendar JS (version globale) -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
-
   <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
 </head>
-
 <body>
-  <div class="container" 
-       data-all-events='{{ all_events|tojson|default("[]", true) }}'
-       data-events-by-room='{{ events_by_room|tojson|default("{}", true) }}'
-       data-rooms='{{ rooms|tojson|default("[]", true) }}'>
+  <div class="container" data-all-events='{{ all_events|tojson|default("[]", true) }}'>
 
     <div class="header">
       <h1>📅 Planning des Sessions</h1>
-    </div>
-    <div>
-      {% if session.get('user') and session['user']['role'] == 'teacher' %}
-        <button id="createEventButton" class="button is-info">Créer un événement</button>
-      {% endif %}
-
-      {% if session.get('user') and session['user']['role'] == 'student' %}
-      <button id="enrollCourseButton" class="button" onclick="window.location.href='/available_courses'">Choisir un cours</button>
-
-      {% endif %}
-    </div>
-       <div class="header">
-        <h1>📅 Planning des Sessions</h1>
-      
-        {% if session.get('user') and session['user']['role'] == 'teacher' %}
-          <div class="create-session-btn">
-            <a href="/create_session">
-              <button class="btn-create">➕ Planifier un cours</button>
-            </a>
-          </div>
+    
+      {% if session.get('user') %}
+        {% if session['user']['role'] == 'teacher' %}
+          <button class="button is-info" onclick="window.location.href='/create_session'">
+            ➕ Planifier un cours
+          </button>
+        {% elif session['user']['role'] == 'student' %}
+          <button class="button is-info" onclick="window.location.href='/available_courses'">
+            🎓 Choisir un cours
+          </button>
         {% endif %}
-      </div>
-      
+      {% endif %}
+    </div>
+    
 
-    <div class="tabs">
-      <button class="tab active" data-tab="all">📋 Toutes les salles</button>
-      {% for room in rooms %}
-        <button class="tab" data-tab="room-{{ room.id }}">🏛️ {{ room.name }}</button>
-      {% endfor %}
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-number" id="total-sessions">0</div>
+        <div class="stat-label">Sessions totales</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="current-week-sessions">0</div>
+        <div class="stat-label">Cette semaine</div>
+      </div>
     </div>
 
-    <div id="tab-all" class="tab-content active">
-      <div class="stats">
-        <div class="stat-item">
-          <div class="stat-number" id="total-sessions">0</div>
-          <div class="stat-label">Sessions totales</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number" id="total-rooms">{{ rooms|length }}</div>
-          <div class="stat-label">Salles disponibles</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number" id="current-week-sessions">0</div>
-          <div class="stat-label">Cette semaine</div>
-        </div>
-      </div>
-      <div id="calendar"></div>
-    </div>
-
-    {% for room in rooms %}
-    <div id="tab-room-{{ room.id }}" class="tab-content">
-      <div class="stats">
-        <div class="stat-item">
-          <div class="stat-number" id="room-{{ room.id }}-sessions">0</div>
-          <div class="stat-label">Sessions {{ room.name }}</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number" id="room-{{ room.id }}-week">0</div>
-          <div class="stat-label">Cette semaine</div>
-        </div>
-      </div>
-      <div id="calendar-room-{{ room.id }}"></div>
-    </div>
-    {% endfor %}
+    <div id="calendar"></div>
   </div>
 
   <script>
-    let calendars = {};
     let tooltip = null;
 
     document.addEventListener('DOMContentLoaded', function () {
       const container = document.querySelector('.container');
       const allEvents = JSON.parse(container.dataset.allEvents);
-      const eventsByRoom = JSON.parse(container.dataset.eventsByRoom);
-      const rooms = JSON.parse(container.dataset.rooms);
 
-      // Initialiser tous les calendriers
-      const commonCalendarConfig = {
+      const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
         locale: 'fr',
         headerToolbar: {
           left: 'prev,next today',
@@ -115,59 +65,18 @@
         selectable: true,
         selectMirror: true,
         eventDisplay: 'block',
+        events: allEvents,
         eventMouseEnter: showTooltip,
         eventMouseLeave: hideTooltip,
         eventClick: showEventDetails
-      };
-
-      // Toutes les salles
-      const mainCalendarEl = document.getElementById('calendar');
-      calendars['all'] = new FullCalendar.Calendar(mainCalendarEl, {
-        ...commonCalendarConfig,
-        events: allEvents
-      });
-      calendars['all'].render();
-
-      // Par salle
-      rooms.forEach(room => {
-        const calendarEl = document.getElementById(`calendar-room-${room.id}`);
-        const roomEvents = eventsByRoom[room.name] || [];
-
-        calendars[`room-${room.id}`] = new FullCalendar.Calendar(calendarEl, {
-          ...commonCalendarConfig,
-          events: roomEvents
-        });
       });
 
-      // Gestion des tabs
-      document.querySelectorAll('.tab').forEach(button => {
-        button.addEventListener('click', () => {
-          const tabId = button.getAttribute('data-tab');
-          showTab(tabId, button);
-        });
-      });
-
-      updateStats(allEvents, eventsByRoom, rooms);
+      calendar.render();
+      updateStats(allEvents);
     });
-
-    function showTab(tabId, tabElement) {
-      document.querySelectorAll('.tab-content').forEach(div => div.classList.remove('active'));
-      document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
-
-      document.getElementById(`tab-${tabId}`).classList.add('active');
-      tabElement.classList.add('active');
-
-      if (calendars[tabId] && !calendars[tabId].isRendered) {
-        calendars[tabId].render();
-        calendars[tabId].isRendered = true;
-      }
-
-      hideTooltip();
-    }
 
     function showTooltip(info) {
       hideTooltip();
-
       const props = info.event.extendedProps;
       const tooltipContent = `
         <strong>${info.event.title}</strong><br>
@@ -177,13 +86,11 @@
         👥 Capacité max: ${props.max_capacity}<br>
         📝 ${props.description || 'Pas de description'}
       `;
-
       tooltip = document.createElement('div');
       tooltip.className = 'event-tooltip';
       tooltip.innerHTML = tooltipContent;
       tooltip.style.left = info.jsEvent.pageX + 10 + 'px';
       tooltip.style.top = info.jsEvent.pageY + 10 + 'px';
-
       document.body.appendChild(tooltip);
     }
 
@@ -217,33 +124,22 @@ Description: ${props.description || 'Aucune description'}
       });
     }
 
-    function updateStats(allEvents, eventsByRoom, rooms) {
-      document.getElementById('total-sessions').textContent = allEvents.length;
+    function updateStats(events) {
+      document.getElementById('total-sessions').textContent = events.length;
 
       const now = new Date();
-      const weekStart = new Date(now.setDate(now.getDate() - now.getDay() + 1));
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 6);
+      const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 1));
+      startOfWeek.setHours(0, 0, 0, 0);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(endOfWeek.getDate() + 6);
+      endOfWeek.setHours(23, 59, 59, 999);
 
-      const thisWeekEvents = allEvents.filter(event => {
+      const eventsThisWeek = events.filter(event => {
         const eventDate = new Date(event.start);
-        return eventDate >= weekStart && eventDate <= weekEnd;
+        return eventDate >= startOfWeek && eventDate <= endOfWeek;
       });
 
-      document.getElementById('current-week-sessions').textContent = thisWeekEvents.length;
-
-      rooms.forEach(room => {
-        const roomEvents = eventsByRoom[room.name] || [];
-        const roomWeekEvents = roomEvents.filter(event => {
-          const eventDate = new Date(event.start);
-          return eventDate >= weekStart && eventDate <= weekEnd;
-        });
-
-        const sessionsEl = document.getElementById(`room-${room.id}-sessions`);
-        const weekEl = document.getElementById(`room-${room.id}-week`);
-        if (sessionsEl) sessionsEl.textContent = roomEvents.length;
-        if (weekEl) weekEl.textContent = roomWeekEvents.length;
-      });
+      document.getElementById('current-week-sessions').textContent = eventsThisWeek.length;
     }
   </script>
 </body>

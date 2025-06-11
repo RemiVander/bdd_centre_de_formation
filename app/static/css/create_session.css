@@ -1,0 +1,85 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f4f8;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    align-items: center;
+  }
+  .container {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
+    width: 100%;
+    max-width: 480px;
+  }
+  h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 25px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #34495e;
+  }
+  input[type="text"],
+  input[type="date"],
+  input[type="number"],
+  select {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1.8px solid #bdc3c7;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  input[type="text"]:focus,
+  input[type="date"]:focus,
+  input[type="number"]:focus,
+  select:focus {
+    border-color: #2980b9;
+    outline: none;
+    box-shadow: 0 0 8px rgba(41, 128, 185, 0.3);
+  }
+  button[type="submit"] {
+    background: #2980b9;
+    color: white;
+    font-weight: 700;
+    padding: 12px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+  }
+  button[type="submit"]:hover {
+    background: #1f6391;
+  }
+  .flash-messages {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #ffdddd;
+    color: #a94442;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+  }
+  
+  .alert {
+    margin: 0.5rem 0;
+  }
+  

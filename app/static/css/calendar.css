@@ -140,19 +140,19 @@ body {
 }
 
 .create-session-btn {
+    text-align: left;
     margin-top: 10px;
-    margin-bottom: 20px;
   }
   
   .btn-create {
     background-color: #4CAF50;
     color: white;
-    padding: 12px 18px;
-    font-size: 16px;
     border: none;
-    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    border-radius: 6px;
+    transition: background-color 0.3s;
   }
   
   .btn-create:hover {

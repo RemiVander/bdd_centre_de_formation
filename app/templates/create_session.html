@@ -78,18 +78,22 @@
       <button type="submit">Enregistrer</button>
     </form>
   </div>
-  {% with messages = get_flashed_messages() %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-    <script>
-      Swal.fire({
-        icon: 'error',
-        title: 'Erreur',
-        text: '{{ messages[0] }}',
-        confirmButtonText: 'Fermer',
-        timer: 5000,
-        timerProgressBar: true
-      });
-    </script>
+    {% for category, message in messages %}
+      {% if category == 'error' %}
+        <script>
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: '{{ message }}',
+            confirmButtonText: 'Fermer',
+            timer: 5000,
+            timerProgressBar: true
+          });
+        </script>
+      {% endif %}
+    {% endfor %}
   {% endif %}
 {% endwith %}
 

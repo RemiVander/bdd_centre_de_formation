@@ -1,28 +1,29 @@
-from flask import Blueprint, render_template, request, redirect, flash, session
-from sqlmodel import Session, select
-from datetime import date, datetime
+from flask import Blueprint, render_template, request, redirect, flash, url_for, session
+from sqlmodel import Session, select, func
 from sqlalchemy import and_
+from sqlalchemy.orm import selectinload
+from datetime import date, datetime, timedelta, timezone
+import json
 
 from app.database import engine
 from app.models.teacher import Teacher
 from app.models.student import Student
 from app.models.room import Room
+from app.models.registration import Registration
 from app.models.class_session import ClassSession, Requirement
-
+from app.models.user import User
 
 main_routes = Blueprint("main", __name__)
+role_id = []
 
 @main_routes.route("/")
 def home():
     return render_template("home.html")
 
-
-
 @main_routes.route("/calendar")
 def calendar_view():
     with Session(engine) as session:
         sessions = session.exec(select(ClassSession)).all()
-        
         rooms = session.exec(select(Room)).all()
         teachers = session.exec(select(Teacher)).all()
         
@@ -53,21 +54,17 @@ def calendar_view():
             }
             
             all_events.append(event)
-            
             room_name = room.name if room else "Non assignée"
-            if room_name not in events_by_room:
-                events_by_room[room_name] = []
-            events_by_room[room_name].append(event)
+            events_by_room.setdefault(room_name, []).append(event)
     
     return render_template(
         "calendar.html", 
         all_events=all_events,
         events_by_room=events_by_room,
         rooms=[{"id": r.id, "name": r.name} for r in rooms]
-
     )
 
-@main_routes.route("/register",methods=["GET", "POST"])
+@main_routes.route("/register", methods=["GET", "POST"])
 def show_register_form():
     return render_template("register_user.html")
 
@@ -105,7 +102,6 @@ def register_teacher():
             session.commit()
             flash("Teacher successfully registered!")
             return redirect("/success")
-        
 
 @main_routes.route("/register_student", methods=["GET", "POST"])
 def register_student():
@@ -143,16 +139,17 @@ def register_student():
             flash("Student successfully registered!")
             return redirect("/success")
 
-
 @main_routes.route("/error_user_exist")
 def error_user_exist():
     return render_template("error_user_exist.html")
 
-from flask import render_template
-
 @main_routes.route("/success")
 def succes():
     return render_template("success.html")
+
+@main_routes.route("/success_session")
+def succes_session():
+    return render_template("success_session.html")
 
 @main_routes.route('/login', methods=["GET", "POST"])
 def login():
@@ -192,12 +189,6 @@ def login():
 def logout():
     return render_template('logout.html')
 
-
-@main_routes.route("/success_session")
-def succes_session():
-    return render_template("success_session.html")
-
-
 @main_routes.route("/create_session", methods=["GET", "POST"])
 def create_session():
     if request.method == "POST":
@@ -214,7 +205,8 @@ def create_session():
 
         requirement_id = request.form.get("requirement_id") or None
         room_id = int(request.form["room_id"])
-        teacher_id = int(request.form["teacher_id"])
+
+        teacher_id = session['user']['id'] if 'user' in session and session['user']['role'] == 'teacher' else int(request.form["teacher_id"])
 
         date_obj = datetime.strptime(session_date, "%Y-%m-%d")
         start_str, end_str = time_slot.split('-')
@@ -272,9 +264,76 @@ def create_session():
         teachers = session.exec(select(Teacher)).all()
         rooms = session.exec(select(Room)).all()
         requirements = session.exec(select(Requirement)).all()
+    
+    return render_template("create_session.html", titles=titles, teachers=teachers, rooms=rooms, requirements=requirements)
 
-        return render_template("create_session.html",
-                               titles=titles,
-                               teachers=teachers,
-                               rooms=rooms,
-                               requirements=requirements)
+@main_routes.route("/available_courses")
+def available_courses():
+    with Session(engine) as session:
+        sessions = session.exec(select(ClassSession)).all()
+        rooms = session.exec(select(Room)).all()
+
+        rooms_dict = {room.id: room for room in rooms}
+
+        statement = select(Registration.session_id, func.count(Registration.id).label('current_enrollment')).group_by(Registration.session_id)
+        session_enrollments = session.exec(statement).all()
+
+        enrollments_dict = {session_id: current_enrollment for session_id, current_enrollment in session_enrollments}
+
+        all_events = []
+        for s in sessions:
+            current_enrollment = enrollments_dict.get(s.id, 0)
+            if current_enrollment < s.max_capacity:
+                room = rooms_dict.get(s.room_id)
+                if room:
+                    event = {
+                        "id": s.id,
+                        "title": s.title,
+                        "start": s.start_date.isoformat(),
+                        "end": s.end_date.isoformat(),
+                        "description": s.description,
+                        "extendedProps": {
+                            "room": room.name,
+                            "max_capacity": s.max_capacity,
+                            "current_enrollment": current_enrollment
+                        },
+                        "backgroundColor": f"hsl({hash(str(s.room_id)) % 360}, 70%, 60%)",
+                        "borderColor": f"hsl({hash(str(s.room_id)) % 360}, 70%, 50%)"
+                    }
+                    all_events.append(event)
+
+    return render_template("available_courses.html", all_events=all_events)
+
+@main_routes.route('/enroll/<int:session_id>', methods=['GET', 'POST'])
+def enroll(session_id):
+    if 'user' not in session or session['user']['role'] != 'student':
+        flash('Vous devez être connecté en tant qu\'étudiant pour vous inscrire à un cours.')
+        return redirect(url_for('main.login'))
+
+    student_id = session['user']['id']
+
+    with Session(engine) as db_session:
+        existing_registration = db_session.exec(
+            select(Registration).where(
+                Registration.student_id == student_id,
+                Registration.session_id == session_id
+            )
+        ).first()
+
+        if existing_registration:
+            flash('Vous êtes déjà inscrit à ce cours.')
+            return redirect(url_for('main.available_courses'))
+
+        new_registration = Registration(
+            student_id=student_id,
+            session_id=session_id,
+            registration_date=datetime.now(timezone.utc),
+            registration_status='confirmed',
+            presence=False
+        )
+
+        db_session.add(new_registration)
+        db_session.commit()
+        flash('Inscription réussie!')
+
+    return redirect(url_for('main.available_courses'))

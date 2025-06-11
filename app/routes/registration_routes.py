@@ -5,14 +5,52 @@ from app.database import engine
 from app.models.teacher import Teacher
 from app.models.student import Student
 
+"""
+Module Flask pour la gestion de l'inscription des utilisateurs dans un centre de formation.
+
+Ce module utilise Flask Blueprint pour définir des routes liées à l'inscription des enseignants
+et des étudiants. Il interagit avec une base de données pour stocker les informations des utilisateurs
+lors de leur inscription.
+
+Routes principales :
+    - register_choice : Affiche une page permettant à l'utilisateur de choisir entre
+      s'inscrire en tant qu'enseignant ou étudiant.
+    - register_teacher : Gère l'inscription des enseignants. Affiche le formulaire d'inscription
+      et traite les données soumises pour créer un nouvel enseignant dans la base de données.
+    - register_student : Gère l'inscription des étudiants. Affiche le formulaire d'inscription
+      et traite les données soumises pour créer un nouvel étudiant dans la base de données.
+
+Le module utilise SQLModel pour interagir avec la base de données et vérifier l'existence
+d'utilisateurs avant de créer de nouveaux enregistrements.
+"""
+
 registration_routes = Blueprint("registration", __name__)
 
 @registration_routes.route("/register")
 def register_choice():
+    """
+    Affiche la page de choix d'inscription.
+
+    Cette route affiche une page permettant à l'utilisateur de choisir s'il souhaite
+    s'inscrire en tant qu'enseignant ou étudiant.
+
+    Returns:
+        Response: La page de choix d'inscription.
+    """
     return render_template("register_user.html")
 
 @registration_routes.route("/register_teacher", methods=["GET", "POST"])
 def register_teacher():
+    """
+    Gère l'inscription des enseignants.
+
+    Si la méthode est GET, affiche le formulaire d'inscription pour les enseignants.
+    Si la méthode est POST, traite les données du formulaire pour créer un nouvel enseignant
+    dans la base de données.
+
+    Returns:
+        Response: Redirige vers une page de succès ou affiche le formulaire d'inscription.
+    """
     if request.method == "GET":
         return render_template("register_teacher.html")
 
@@ -40,6 +78,16 @@ def register_teacher():
 
 @registration_routes.route("/register_student", methods=["GET", "POST"])
 def register_student():
+    """
+    Gère l'inscription des étudiants.
+
+    Si la méthode est GET, affiche le formulaire d'inscription pour les étudiants.
+    Si la méthode est POST, traite les données du formulaire pour créer un nouvel étudiant
+    dans la base de données.
+
+    Returns:
+        Response: Redirige vers une page de succès ou affiche le formulaire d'inscription.
+    """
     if request.method == "GET":
         return render_template("register_student.html")
 

@@ -5,10 +5,39 @@ from app.models.class_session import ClassSession
 from app.models.room import Room
 from app.models.teacher import Teacher
 
+"""
+Module Flask pour l'affichage et la gestion d'un calendrier des sessions de cours.
+
+Ce module utilise Flask Blueprint pour définir des routes liées à l'affichage d'un calendrier
+interactif des sessions de cours. Il récupère les informations sur les sessions, les salles et
+les enseignants depuis la base de données et les organise pour être affichées dans un calendrier.
+
+Routes principales :
+    - calendar_view : Récupère toutes les sessions de cours, les salles et les enseignants
+      depuis la base de données, et les organise pour être affichées dans un calendrier.
+      Les événements du calendrier sont colorés en fonction de la salle et regroupés par salle.
+
+Le module utilise SQLModel pour interagir avec la base de données et récupérer les informations
+nécessaires pour chaque vue.
+"""
+
 calendar_routes = Blueprint("calendar", __name__)
 
 @calendar_routes.route("/calendar")
 def calendar_view():
+    """
+    Affiche un calendrier des sessions de cours.
+
+    Cette route récupère toutes les sessions de cours, les salles et les enseignants
+    depuis la base de données. Elle organise ces informations en événements pour un
+    calendrier interactif, où chaque événement est coloré en fonction de la salle
+    et contient des informations supplémentaires telles que l'enseignant et la capacité
+    maximale de la salle.
+
+    Returns:
+        Response: La page du calendrier avec les événements organisés et colorés,
+        ainsi que les événements regroupés par salle.
+    """
     with Session(engine) as session:
         sessions = session.exec(select(ClassSession)).all()
         rooms = session.exec(select(Room)).all()

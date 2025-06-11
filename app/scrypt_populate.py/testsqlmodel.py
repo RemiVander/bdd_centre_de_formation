@@ -15,6 +15,30 @@ from app.database import engine
 SQLModel.metadata.create_all(engine)
 fake = Faker(locale="fr_FR")
 
+"""
+Script pour peupler une base de données avec des données fictives pour un centre de formation.
+
+Ce script utilise SQLModel pour interagir avec une base de données SQLite et Faker pour générer
+des données fictives réalistes. Il permet de nettoyer les données existantes et de peupler
+la base de données avec des enseignants, des salles, des sessions de cours, des étudiants,
+des administrateurs, des équipements, des statuts et des prérequis.
+
+Fonctions principales :
+    - clear_all_data : Nettoie toutes les données existantes dans la base de données.
+    - clear_specific_table : Nettoie une table spécifique dans la base de données.
+    - populate_table_teacher : Génère et insère des données fictives pour les enseignants.
+    - populate_table_room : Génère et insère des données fictives pour les salles.
+    - populate_table_requirements : Génère et insère des données fictives pour les prérequis.
+    - populate_table_status : Génère et insère des données pour les statuts.
+    - populate_realistic_class_sessions : Génère des sessions de cours avec des horaires réalistes.
+    - populate_table_student : Génère et insère des données fictives pour les étudiants.
+    - populate_table_admin : Génère et insère des données fictives pour les administrateurs.
+    - populate_table_equipments : Génère et insère des données pour les équipements.
+
+Le script est conçu pour être exécuté directement, nettoyant d'abord les données existantes,
+puis peuplant la base de données avec de nouvelles données fictives.
+"""
+
 # Fonctions de nettoyage
 def clear_all_data():
     """Nettoie toutes les données existantes"""

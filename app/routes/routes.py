@@ -1,14 +1,15 @@
 from flask import Blueprint, render_template, request, redirect, flash, url_for, session
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 from app.database import engine
 from app.models.teacher import Teacher
 from app.models.student import Student
 from app.models.room import Room
+from app.models.registration import Registration
 from app.models.class_session import ClassSession, Requirement
 from app.models.user import User
 from sqlalchemy.orm import selectinload
 import json
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 main_routes = Blueprint("main", __name__)
 role_id = []
@@ -248,41 +249,83 @@ def create_session():
     return render_template("create_session.html",titles=titles,teachers=teachers,rooms=rooms,requirements=requirements)
 
 
+
 @main_routes.route("/available_courses")
 def available_courses():
     with Session(engine) as session:
-        # Récupérez toutes les sessions et les salles
+        # Récupérer toutes les sessions
         sessions = session.exec(select(ClassSession)).all()
         rooms = session.exec(select(Room)).all()
 
-        # Créez un dictionnaire pour les salles
+        # Créer un dictionnaire pour les salles
         rooms_dict = {room.id: room for room in rooms}
 
-        # Filtrez les sessions en fonction de la capacité disponible
-        available_sessions = []
-        for s in sessions:
-            room = rooms_dict.get(s.room_id)
-            if room and s.current_enrollment < s.max_capacity:  # Assurez-vous que current_enrollment est un champ de votre modèle ClassSession
-                available_sessions.append(s)
+        # Récupérer le nombre d'inscriptions pour chaque session
+        statement = select(Registration.session_id, func.count(Registration.id).label('current_enrollment')).group_by(Registration.session_id)
+        session_enrollments = session.exec(statement).all()
 
-        # Préparez les événements pour le calendrier
+        # Créer un dictionnaire pour les inscriptions
+        enrollments_dict = {session_id: current_enrollment for session_id, current_enrollment in session_enrollments}
+
         all_events = []
-        for s in available_sessions:
-            room = rooms_dict.get(s.room_id)
-            event = {
-                "id": s.id,
-                "title": s.title,
-                "start": s.start_date.isoformat(),
-                "end": s.end_date.isoformat(),
-                "description": s.description,
-                "extendedProps": {
-                    "room": room.name if room else "Non assignée",
-                    "max_capacity": s.max_capacity,
-                    "current_enrollment": s.current_enrollment
-                },
-                "backgroundColor": f"hsl({hash(str(s.room_id)) % 360}, 70%, 60%)",
-                "borderColor": f"hsl({hash(str(s.room_id)) % 360}, 70%, 50%)"
-            }
-            all_events.append(event)
+        for s in sessions:
+            # Obtenir le nombre d'inscriptions pour la session actuelle
+            current_enrollment = enrollments_dict.get(s.id, 0)
+
+            # Vérifier si la session a des places disponibles
+            if current_enrollment < s.max_capacity:
+                room = rooms_dict.get(s.room_id)
+                if room:
+                    event = {
+                        "id": s.id,
+                        "title": s.title,
+                        "start": s.start_date.isoformat(),
+                        "end": s.end_date.isoformat(),
+                        "description": s.description,
+                        "extendedProps": {
+                            "room": room.name,
+                            "max_capacity": s.max_capacity,
+                            "current_enrollment": current_enrollment
+                        },
+                        "backgroundColor": f"hsl({hash(str(s.room_id)) % 360}, 70%, 60%)",
+                        "borderColor": f"hsl({hash(str(s.room_id)) % 360}, 70%, 50%)"
+                    }
+                    all_events.append(event)
 
     return render_template("available_courses.html", all_events=all_events)
+
+@main_routes.route('/enroll/<int:session_id>', methods=['GET', 'POST'])
+def enroll(session_id):
+    if 'user' not in session or session['user']['role'] != 'student':
+        flash('Vous devez être connecté en tant qu\'étudiant pour vous inscrire à un cours.')
+        return redirect(url_for('main.login'))
+
+    student_id = session['user']['id']
+
+    with Session(engine) as db_session:
+        # Vérifier si l'étudiant est déjà inscrit à cette session
+        existing_registration = db_session.exec(
+            select(Registration).where(
+                Registration.student_id == student_id,
+                Registration.session_id == session_id
+            )
+        ).first()
+
+        if existing_registration:
+            flash('Vous êtes déjà inscrit à ce cours.')
+            return redirect(url_for('main.available_courses'))
+
+        # Créer une nouvelle inscription
+        new_registration = Registration(
+            student_id=student_id,
+            session_id=session_id,
+            registration_date=datetime.now(timezone.utc),
+            registration_status='confirmed',
+            presence=False
+        )
+
+        db_session.add(new_registration)
+        db_session.commit()
+        flash('Inscription réussie!')
+
+    return redirect(url_for('main.available_courses'))

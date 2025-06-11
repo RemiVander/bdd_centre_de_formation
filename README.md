@@ -15,42 +15,42 @@ Ce projet est une application web développée avec Flask et SQLModel pour gére
 
 ## Structure du Projet
 
-    alembic/ : Contient les fichiers de configuration et les scripts de migration pour la base de données.
-        versions/ : Contient les fichiers de migration de la base de données.
-        env.py : Configuration de l'environnement Alembic.
-        script.py.mako : Template pour les scripts de migration.
+    -alembic/ : Contient les fichiers de configuration et les scripts de migration pour la base de données.
+        -versions/ : Contient les fichiers de migration de la base de données.
+        -env.py : Configuration de l'environnement Alembic.
+        -script.py.mako : Template pour les scripts de migration.
 
-    app/ : Contient le code source principal de l'application Flask.
-        data/ : Contient le fichier de la base de données SQLite.
-        models/ : Contient les modèles de données SQLModel.
-            admin.py : Modèle pour les administrateurs.
-            class_session.py : Modèle pour les sessions de cours.
-            equipments.py : Modèle pour les équipements.
-            registration.py : Modèle pour les inscriptions.
-            room.py : Modèle pour les salles.
-            student.py : Modèle pour les étudiants.
-            teacher.py : Modèle pour les enseignants.
-            user.py : Modèle pour les utilisateurs.
-        routes/ : Définit les routes et les vues de l'application.
-            routes.py : Contient les routes principales de l'application.
+    -app/ : Contient le code source principal de l'application Flask.
+        -data/ : Contient le fichier de la base de données SQLite.
+        -models/ : Contient les modèles de données SQLModel.
+            -admin.py : Modèle pour les administrateurs.
+            -class_session.py : Modèle pour les sessions de cours.
+            -equipments.py : Modèle pour les équipements.
+            -registration.py : Modèle pour les inscriptions.
+            -room.py : Modèle pour les salles.
+            -student.py : Modèle pour les étudiants.
+            -teacher.py : Modèle pour les enseignants.
+            -user.py : Modèle pour les utilisateurs.
+        -routes/ : Définit les routes et les vues de l'application.
+            -routes.py : Contient les routes principales de l'application.
 
-    script_populate/ : Contient un script pour peupler la base de données avec des données initiales.
+    -script_populate/ : Contient un script pour peupler la base de données avec des données initiales.
 
-    static/ : Contient les fichiers statiques (CSS,images).
-        assets/ : Contient les ressources statiques supplémentaires.
-        css/ : Contient les fichiers CSS pour le style de l'application.
+    -static/ : Contient les fichiers statiques (CSS,images).
+        -assets/ : Contient les ressources statiques supplémentaires.
+        -css/ : Contient les fichiers CSS pour le style de l'application.
 
-    templates/ : Contient les fichiers de template HTML.
-        available_course.html : Page pour afficher les cours disponibles.
-        calendar.html : Page pour afficher le calendrier des cours.
-        create_session.html : Page pour créer une nouvelle session de cours.
-        error_user_exists.html : Page d'erreur pour les utilisateurs existants.
-        home.html : Page d'accueil de l'application.
-        login.html : Page de connexion.
-        register_student.html : Page d'inscription pour les étudiants.
-        register_teacher.html : Page d'inscription pour les enseignants.
-        success_session.html : Page de succès pour la création de session.
-        success.html : Page de succès générale.
+    -templates/ : Contient les fichiers de template HTML.
+        -available_course.html : Page pour afficher les cours disponibles.
+        -calendar.html : Page pour afficher le calendrier des cours.
+        -create_session.html : Page pour créer une nouvelle session de cours.
+        -error_user_exists.html : Page d'erreur pour les utilisateurs existants.
+        -home.html : Page d'accueil de l'application.
+        -login.html : Page de connexion.
+        -register_student.html : Page d'inscription pour les étudiants.
+        -register_teacher.html : Page d'inscription pour les enseignants.
+        -success_session.html : Page de succès pour la création de session.
+        -success.html : Page de succès générale.
 
 
 ## Prérequis

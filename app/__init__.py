@@ -6,6 +6,18 @@ from app.routes.registration_routes import registration_routes
 from app.routes.session_routes import session_routes
 
 def create_app():
+    """
+    Crée et configure une instance de l'application Flask.
+
+    Cette fonction initialise une nouvelle application Flask avec les configurations
+    nécessaires, y compris les dossiers pour les templates et les fichiers statiques.
+    Elle enregistre également les blueprints pour différentes parties de l'application,
+    tels que l'authentification, le calendrier, la page d'accueil, l'inscription,
+    et la gestion des sessions.
+
+    Returns:
+        Flask: Une instance configurée de l'application Flask prête à être exécutée.
+    """
     app = Flask(__name__, template_folder="templates", static_folder="static")
     app.secret_key = "une_clé_ultra_secrète"
 

@@ -1,4 +1,4 @@
-# Contexte du projet
+# 🎯 Contexte du projet
 
 Vous êtes Data Engineer au sein d’un centre de formation (CF-Tech) qui dispense des cours et ateliers sur les technologies numériques. Jusqu’à présent, les informations concernant les sessions, les salles, les formateurs et les apprenants étaient gérées à la main, au moyen de fichiers Excel et d’un ERP vieillissant. La direction souhaite passer à une solution plus robuste : une base de données relationnelle pilotée par un ORM (SQLAlchemy/SQLModel) avec migrations (Alembic) et validation stricte des données (Pydantic).
 
@@ -14,16 +14,29 @@ L’objectif est d’avoir un système centralisé capable de :
 
 Ce projet est une application web développée avec Flask et SQLModel pour gérer les cours, les salles, les enseignants et les inscriptions des étudiants dans un centre de formation. L'application permet aux étudiants de s'inscrire à des cours et aux enseignants de gérer leurs sessions.
 
-## Fonctionnalités
+## 📌 Fonctionnalités
 
 - Affichage des cours disponibles
 - Inscription des étudiants aux cours
 - Gestion des sessions par les enseignants
 - Visualisation des salles et des capacités
 
-## Structure du Projet
+## 🛠️ Technologies Utilisées
+  
+-   🐍 Python
+
+-   ⚡ Flask
+
+-   🗃️  SQLModel
+
+-   ⚗️ alembic
+
+-   📖 pydantic
+
+
+## 📁 Structure du Projet
 ```
-bdd_centre_de_formatop,/
+bdd_centre_de_formation/
 ├── alembic/                # Contient les fichiers de configuration et les scripts de migration pour la base de données.
 │   ├── versions/               # Contient les fichiers de migration de la base de données.
 │   ├── env.py                  # Configuration de l'environnement Alembic.
@@ -65,9 +78,37 @@ bdd_centre_de_formatop,/
 - Python 3.8 ou supérieur
 - pip (Python Package Installer)
 
-## Installation
 
-1. Clonez le dépôt sur votre machine locale :
-
-```bash
+## 🚀 Mise en route  
+  
+### 📦 Installation  
+  
+```bash  
 git clone https://github.com/votre-utilisateur/centre-de-formation.git
+cd bdd_centre_de_formation
+
+sur linux
+python3 -m venv .venv
+source venv/bin/activate
+
+sur windows
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+pip install -r requirements.txt
+
+lancer flask run
+
+```
+## 📜 License
+
+This project is licensed under the MIT License ©️ 2025.  
+You are free to use, modify, and distribute this project with proper attribution.
+
+## 👥 L'équipe
+
+Ce projet a été créé dans le cadre de la formation **Data Engineering Bootcamp – Simplon HDF 2025**.  par une équipe de 3 apprenants:
+
+🔗 [Rémi V.](https://github.com/remivander)  
+🔗 [Jean-Pierre E](https://github.com/seiyakazana)  
+🔗 [Stéphane M](https://github.com/smuller59)

@@ -40,7 +40,9 @@ def create_session():
     Returns:
         Response: Redirige vers une page de succès ou affiche le formulaire de création de session.
     """
-
+    if 'user' not in session:
+        return redirect('/login')
+    
     if request.method == "POST":
         title = request.form["title"]
         description = request.form["description"]

@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Inscription réussie</title>
-    <script>
-        window.onload = function() {
-            alert("Inscription réussie !");
-            window.location.href = "/login";
-        };
-    </script>
+  <meta charset="UTF-8">
+  <title>Inscription réussie</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/success.css') }}">
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.location.href = "/login";
+      }, 3000);
+    };
+  </script>
 </head>
 <body>
+  <div class="card">
+    <h1>Inscription réussie !</h1>
+    <p>Vous allez être redirigé(e) vers la page de connexion...</p>
+    <a class="button" href="/login">Aller maintenant</a>
+  </div>
 </body>
 </html>

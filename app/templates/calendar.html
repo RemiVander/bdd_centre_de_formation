@@ -13,6 +13,7 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
 </head>
+
 <body>
   <div class="container" 
        data-all-events='{{ all_events|tojson|default("[]", true) }}'
@@ -22,7 +23,16 @@
     <div class="header">
       <h1>📅 Planning des Sessions</h1>
     </div>
+    <div>
+      {% if session.get('user') and session['user']['role'] == 'teacher' %}
+        <button id="createEventButton" class="button is-info">Créer un événement</button>
+      {% endif %}
 
+      {% if session.get('user') and session['user']['role'] == 'student' %}
+      <button id="enrollCourseButton" class="button" onclick="window.location.href='/available_courses'">Choisir un cours</button>
+
+      {% endif %}
+    </div>
     <div class="tabs">
       <button class="tab active" data-tab="all">📋 Toutes les salles</button>
       {% for room in rooms %}

@@ -27,6 +27,6 @@ class User(SQLModel, table=False):
     name: str = Field(max_length=50)
     surname: str = Field(max_length=50)
     email: EmailStr
-    creation_date: datetime = Field(default_factory=datetime.utcnow)
+    creation_date: datetime = Field(default_factory=datetime.now)
     is_active: bool = Field(default=True)
     role: str

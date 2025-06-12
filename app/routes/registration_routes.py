@@ -99,14 +99,21 @@ def register_student():
     level_degree = request.form.get("level_degree")
     diploma = request.form.get("diploma")
 
+    birth_date_obj = date.fromisoformat(birth_date)
+    today = date.today()
+    age = today.year - birth_date_obj.year - ((today.month, today.day) < (birth_date_obj.month, birth_date_obj.day))
+    
+    if age < 16:
+        flash("L'étudiant doit avoir au moins 16 ans pour s'inscrire.")
+        return redirect("/register_student")
+
     with Session(engine) as session:
         if session.exec(select(Student).where(Student.email == email)).first():
             flash("Un utilisateur avec cet email existe déjà.")
-            return redirect("/error_user_exist")
 
         student = Student(
             name=name, surname=surname, email=email, role="student",
-            birth_date=date.fromisoformat(birth_date), telephone=telephone,
+            birth_date=birth_date_obj, telephone=telephone,
             level_degree=level_degree, diploma=diploma, is_active=True
         )
         session.add(student)

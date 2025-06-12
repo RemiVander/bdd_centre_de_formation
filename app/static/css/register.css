@@ -134,3 +134,17 @@ input:invalid {
 input:valid {
     border-color: #27ae60;
 }
+
+.flash-messages {
+    margin-bottom: 20px;
+    background-color: #ffe0e0;
+    border: 1px solid #f5c2c2;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.flash-message {
+    color: #b30000;
+    font-weight: bold;
+    margin: 0;
+}

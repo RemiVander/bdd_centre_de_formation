@@ -42,8 +42,8 @@ class Student(User, table=True):
             Student: L'instance de Student validée.
 
         Raises:
-            ValueError: Si l'étudiant est mineur, c'est-à-dire né après le 1er juin 2009.
+            ValueError: Si l'étudiant est mineur, c'est-à-dire agé de plus de 16 ans.
         """
-        if self.birth_date >= date(2009,6,1):
+        if self.birth_date > date.today().replace(year=date.today().year - 16):
             raise ValueError("student is underage")
         return self

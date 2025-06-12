@@ -13,7 +13,6 @@
 
     <div class="header">
       <h1>📅 Planning des Sessions</h1>
-    
       {% if session.get('user') %}
         {% if session['user']['role'] == 'teacher' %}
           <button class="button is-info" onclick="window.location.href='/create_session'">
@@ -26,7 +25,6 @@
         {% endif %}
       {% endif %}
     </div>
-    
 
     <div class="stats">
       <div class="stat-item">
@@ -37,6 +35,13 @@
         <div class="stat-number" id="current-week-sessions">0</div>
         <div class="stat-label">Cette semaine</div>
       </div>
+    </div>
+
+    <div class="tabs" id="room-tabs">
+      <button class="tab active" data-room="all">Toutes les salles</button>
+      {% for room in rooms %}
+        <button class="tab" data-room="{{ room.name }}">{{ room.name }}</button>
+      {% endfor %}
     </div>
 
     <div id="calendar"></div>
@@ -73,6 +78,24 @@
 
       calendar.render();
       updateStats(allEvents);
+
+      const tabs = document.querySelectorAll('.tab');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function () {
+          tabs.forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+
+          const selectedRoom = this.dataset.room;
+          const filteredEvents = selectedRoom === 'all'
+            ? allEvents
+            : allEvents.filter(e => e.extendedProps.room === selectedRoom);
+
+          calendar.removeAllEvents();
+          calendar.addEventSource(filteredEvents);
+          updateStats(filteredEvents);
+        });
+      });
     });
 
     function showTooltip(info) {

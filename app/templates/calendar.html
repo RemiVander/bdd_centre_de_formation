@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Planning des Sessions</title>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
+</head>
+<body>
+  <div class="container" data-all-events='{{ all_events|tojson|default("[]", true) }}'>
+
+    <div class="header">
+      <h1>📅 Planning des Sessions</h1>
+    
+      {% if session.get('user') %}
+        {% if session['user']['role'] == 'teacher' %}
+          <button class="button is-info" onclick="window.location.href='/create_session'">
+            ➕ Planifier un cours
+          </button>
+        {% elif session['user']['role'] == 'student' %}
+          <button class="button is-info" onclick="window.location.href='/available_courses'">
+            🎓 Choisir un cours
+          </button>
+        {% endif %}
+      {% endif %}
+    </div>
+    
+
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-number" id="total-sessions">0</div>
+        <div class="stat-label">Sessions totales</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="current-week-sessions">0</div>
+        <div class="stat-label">Cette semaine</div>
+      </div>
+    </div>
+
+    <div id="calendar"></div>
+  </div>
+
+  <script>
+    let tooltip = null;
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const container = document.querySelector('.container');
+      const allEvents = JSON.parse(container.dataset.allEvents);
+
+      const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+        locale: 'fr',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        initialView: 'timeGridWeek',
+        height: 600,
+        slotMinTime: '08:00:00',
+        slotMaxTime: '18:00:00',
+        weekends: false,
+        editable: false,
+        selectable: true,
+        selectMirror: true,
+        eventDisplay: 'block',
+        events: allEvents,
+        eventMouseEnter: showTooltip,
+        eventMouseLeave: hideTooltip,
+        eventClick: showEventDetails
+      });
+
+      calendar.render();
+      updateStats(allEvents);
+    });
+
+    function showTooltip(info) {
+      hideTooltip();
+      const props = info.event.extendedProps;
+      const tooltipContent = `
+        <strong>${info.event.title}</strong><br>
+        📅 ${formatDate(info.event.start)} - ${formatDate(info.event.end)}<br>
+        👨‍🏫 Enseignant: ${props.teacher}<br>
+        🏛️ Salle: ${props.room}<br>
+        👥 Capacité max: ${props.max_capacity}<br>
+        📝 ${props.description || 'Pas de description'}
+      `;
+      tooltip = document.createElement('div');
+      tooltip.className = 'event-tooltip';
+      tooltip.innerHTML = tooltipContent;
+      tooltip.style.left = info.jsEvent.pageX + 10 + 'px';
+      tooltip.style.top = info.jsEvent.pageY + 10 + 'px';
+      document.body.appendChild(tooltip);
+    }
+
+    function hideTooltip() {
+      if (tooltip) {
+        tooltip.remove();
+        tooltip = null;
+      }
+    }
+
+    function showEventDetails(info) {
+      const props = info.event.extendedProps;
+      alert(`Détails de la session:
+
+Titre: ${info.event.title}
+Dates: ${formatDate(info.event.start)} - ${formatDate(info.event.end)}
+Enseignant: ${props.teacher}
+Salle: ${props.room}
+Capacité maximale: ${props.max_capacity}
+Description: ${props.description || 'Aucune description'}
+`);
+    }
+
+    function formatDate(date) {
+      return new Date(date).toLocaleString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function updateStats(events) {
+      document.getElementById('total-sessions').textContent = events.length;
+
+      const now = new Date();
+      const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 1));
+      startOfWeek.setHours(0, 0, 0, 0);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(endOfWeek.getDate() + 6);
+      endOfWeek.setHours(23, 59, 59, 999);
+
+      const eventsThisWeek = events.filter(event => {
+        const eventDate = new Date(event.start);
+        return eventDate >= startOfWeek && eventDate <= endOfWeek;
+      });
+
+      document.getElementById('current-week-sessions').textContent = eventsThisWeek.length;
+    }
+  </script>
+</body>
+</html>
